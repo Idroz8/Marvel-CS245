@@ -85,41 +85,8 @@ def main():
 
     st.write(f"**🔴 Most Improving Needed:** {label}")
     st.write(f"- You were `{user_means[worst_feat]:.2f}` vs. pro average `{good_means[worst_feat]:.2f}`")
-    st.write(f"- Feature importance weight: `{imp_val:.2f}`")
     st.write(f"- Overall impact score: `{impact[worst_feat]:.2f}`")
 
-      # 4️⃣ Feature-level feedback using RF importances
-    st.markdown("## 3️⃣ Personalized Feedback")
-
-    # Compute mean stats for pros vs user
-    good_means = train_df[train_df['label'] == 1][features].mean()
-    user_means = match_df[features].mean()
-    diffs = (good_means - user_means).abs()
-
-    importances = pd.Series(rf.feature_importances_, index=features)
-    impact = diffs * importances
-
-    # Identify single most lacking feature for text
-    worst_feat = impact.idxmax()
-    label = FEATURE_LABELS[worst_feat]
-    diff_val = good_means[worst_feat] - user_means[worst_feat]
-    imp_val = importances[worst_feat]
-    st.write(f"**🔴 Most Improvement Needed:** {label}")
-    st.write(f"- You were `{user_means[worst_feat]:.2f}` vs. pro average `{good_means[worst_feat]:.2f}`")
-    st.write(f"- Feature importance weight: `{imp_val:.2f}`\n")
-
-    # Now build a 0–100 bar chart of the top 3 features
-    impact_top3 = impact.nlargest(3)
-    impact_norm = (impact_top3 / impact_top3.max() * 100).round(1)
-
-    feedback_df = pd.DataFrame({
-        'Feature': [FEATURE_LABELS[f] for f in impact_norm.index],
-        'Impact Score': impact_norm.values
-    }).set_index('Feature')
-
-    st.markdown("### 📊 Top 3 Features Needing Improvement (0–100 scale)")
-    st.bar_chart(feedback_df)
-
-
+   
 if __name__ == "__main__":
     main()
